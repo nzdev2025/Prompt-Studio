@@ -1,0 +1,5 @@
+{
+  "name": "Prompt Studio",
+  "description": "A comprehensive UI for managing, testing, and deploying prompts for generative AI models. It provides a full suite of tools for prompt engineering, from versioning to A/B testing and performance monitoring.",
+  "requestFramePermissions": []
+}
