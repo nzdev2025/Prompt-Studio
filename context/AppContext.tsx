@@ -10,7 +10,7 @@ interface AppContextType {
   setTheme: (theme: Theme) => void;
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey, params?: { [key: string]: string | number }) => string;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -20,7 +20,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return (localStorage.getItem('theme') as Theme) || 'light';
   });
   const [language, setLanguage] = useState<Language>(() => {
-    return (localStorage.getItem('language') as Language) || 'en';
+    return (localStorage.getItem('language') as Language) || 'th';
   });
 
   useEffect(() => {
@@ -34,8 +34,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     localStorage.setItem('language', language);
   }, [language]);
 
-  const t = useCallback((key: TranslationKey): string => {
-    return translations[language][key] || translations['en'][key];
+  const t = useCallback((key: TranslationKey, params?: { [key: string]: string | number }): string => {
+    let translation = translations[language][key] || translations['en'][key] || String(key);
+    if (params) {
+      Object.keys(params).forEach(paramKey => {
+        const value = params[paramKey];
+        translation = translation.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(value));
+      });
+    }
+    return translation;
   }, [language]);
 
   const contextValue = useMemo(() => ({

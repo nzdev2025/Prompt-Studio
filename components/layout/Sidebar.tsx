@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             <div className="p-2 bg-primary-500 rounded-lg">
               <FileText className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-800 dark:text-white">Prompt Studio</span>
+            <span className="text-xl font-bold text-gray-800 dark:text-white">{t('app_title')}</span>
           </div>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500 dark:text-gray-400">
             <X className="h-6 w-6" />

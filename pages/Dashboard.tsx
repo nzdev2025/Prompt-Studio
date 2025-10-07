@@ -4,25 +4,36 @@ import { getProjects, getPromptsByProjectId } from '../data/store';
 import { useAppContext } from '../hooks/useAppContext';
 import { ArrowRight, Plus } from 'lucide-react';
 import type { Project } from '../types';
+import type { TranslationKey } from '../lib/i18n';
+import AnalyticsDashboard from '../components/dashboard/AnalyticsDashboard';
 
-const timeAgo = (date: string) => {
+// Helper function to format time with i18n support
+const formatTimeAgo = (date: string, t: (key: TranslationKey, params?: { [key: string]: string | number }) => string) => {
     const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    if (seconds < 5) return "just now";
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + " years ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + " months ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + " days ago";
-    interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + " hours ago";
-    interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + " minutes ago";
-    return Math.floor(seconds) + " seconds ago";
+    if (seconds < 5) return t('time_ago_now');
+
+    const intervals: { [key: string]: number } = {
+        'years': 31536000,
+        'months': 2592000,
+        'days': 86400,
+        'hours': 3600,
+        'minutes': 60
+    };
+
+    for (const key in intervals) {
+        const interval = seconds / intervals[key];
+        if (interval > 1) {
+            return t(`time_ago_${key}` as TranslationKey, { count: Math.floor(interval) });
+        }
+    }
+
+    return t('time_ago_seconds', { count: Math.floor(seconds) });
 };
+
 
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
   const navigate = useNavigate();
+  const { t } = useAppContext(); // Use context directly in the component
   const promptCount = getPromptsByProjectId(project.id).length;
 
   return (
@@ -33,8 +44,8 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
       <h3 className="text-lg font-bold text-primary-600 dark:text-primary-400">{project.name}</h3>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-4 h-10 overflow-hidden">{project.description}</p>
       <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-500">
-        <span>{promptCount} {promptCount === 1 ? 'Prompt' : 'Prompts'}</span>
-        <span>{timeAgo(project.updatedAt)}</span>
+        <span>{promptCount} {t(promptCount === 1 ? 'prompt_singular' : 'prompt_plural')}</span>
+        <span>{formatTimeAgo(project.updatedAt, t)}</span>
       </div>
     </div>
   );
@@ -57,7 +68,7 @@ const Dashboard: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">{t('dashboard')}</h1>
         <button className="flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
           <Plus className="h-5 w-5 mr-2" />
-          New Project
+          {t('new_project')}
         </button>
       </div>
 
@@ -75,14 +86,10 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       
-       {/* Placeholder for more dashboard widgets */}
-       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Activity Feed</h2>
-            <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                <p>Activity feed will be displayed here.</p>
-                <p className="text-sm">// TODO_CONNECT to real activity data.</p>
-            </div>
-       </div>
+      {/* Analytics Section */}
+      <div className="mt-8">
+        <AnalyticsDashboard />
+      </div>
 
     </div>
   );
