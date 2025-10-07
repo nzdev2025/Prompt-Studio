@@ -11,7 +11,7 @@ const Settings: React.FC = () => {
     <div className="space-y-8 max-w-4xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">{t('settings')}</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your application preferences.</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">{t('settings_description')}</p>
       </div>
       
       {/* Appearance Settings */}
